@@ -3,15 +3,22 @@ let fs = require('fs')
 let path = require('path')
 let mime = require('mime')
 
-path
-
 let parsePath = p => {
   let ls = fs.readdirSync(p)
-  ls = ls.map(n => {return {name:n}})
-  ls = ls.map(ent => {ent.abs = path.join(p,ent.name);return ent})
+  ls = ls.map(n => {
+    let ent = {name:n}
+    ent.abs = path.join(p,ent.name)
+    return ent
+  })
   ls = ls.filter(ent => fs.statSync(ent.abs).isDirectory())
-  ls = ls.map(ent => {ent.dir = fs.readdirSync(ent.abs);return ent})
-
+  ls = ls.map(ent => {
+    ent.dir = fs.readdirSync(ent.abs)
+    if (ent.hasPlan = ent.dir.find(x => x === 'plan.md')?true:false){
+      ent.planPath = path.join(ent.abs,'plan.md')
+      ent.plan = fs.readFileSync(ent.planPath).toString()
+    }
+    return ent
+  })
   return ls
 }
 
@@ -65,4 +72,4 @@ let host = '127.0.0.1'
 server.listen(port, host)
 console.log('Listening at http://' + host + ':' + port)
 
-console.log(parsePath('..'))
+console.log(parsePath('..').filter(e=>e.hasPlan))
