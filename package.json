@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mime": "^1.3.4"
+    "async": "^2.1.4",
+    "mime": "^1.3.4",
+    "simple-git": "^1.64.0"
   }
 }

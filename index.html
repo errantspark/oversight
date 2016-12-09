@@ -1,0 +1,16 @@
+<head>
+  <!link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <script>
+ console.log("lol") 
+function httpGet(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+let k = httpGet('/update')
+  </script>
+</body>
