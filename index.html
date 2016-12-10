@@ -1,17 +1,38 @@
 <head>
-  <!link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="lib.js"></script>
+  <script src="chroma.min.js"></script>
 </head>
 <body>
-  <script href="lib.js"></script>
+  <div id="container">
+  </div>
   <script>
-function httpGet(theUrl)
+    function httpGet(theUrl)
 
 {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+  xmlHttp.send( null );
+  return xmlHttp.responseText;
 }
+let spect = chroma.scale('Spectral')
 let projects = JSON.parse(httpGet('/update'))
-  </script>
+  projects = projects.filter(proj => !proj.hasGit || proj.gitUrl.match(/errantspark/))
+let meta = getMeta(projects)
+let timeToF = rescale(meta.oldest,meta.newest)
+
+projects.sort((a,b) => b.date - a.date)
+projects.forEach(p => {
+  let container = document.getElementById('container')
+  let d = document.createElement('div')
+      x = p.date
+  
+  d.innerHTML = p.name
+  d.classList.add('project')
+    let c = timeToF(x)
+  d.style.background = spect(c).hex()
+
+    container.appendChild(d)
+})
+</script>
 </body>
