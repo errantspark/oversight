@@ -18,14 +18,28 @@ body {
   flex-basis: auto;
   font-size: 1.2em;
   vertical-align: middle;
-  text-align: center;
   display: block;
   margin: 0.5px;
   height: 8em;
-  line-height: 8em;
   font-family: sans-serif;
-  padding-left: 3em;
-  padding-right: 3em;
+  padding-left: 2em;
+  padding-right: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.text-wrapper {
+  margin-top: -0.2em;
+}
+.log {
+  display: block;
+  font-size: 0.7em;
+}
+.title {
+  display: block;
+  line-height: 1.5em;
+  border-bottom: 4px solid black;
+  margin-bottom: 0.2em;
 }
 @media (max-width: 32em) {
   .project {
