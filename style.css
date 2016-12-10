@@ -1,21 +1,35 @@
 body {
   margin: 0px;
   padding: 0px;
+  background: #FFF8E7;
 }
 #container {
+  width: 90vw;
+  justify-content: center;
+  margin: auto;
+  padding: 5px;
   display: flex;
   flex-wrap: wrap;
 }
 .project{
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  vertical-align: middle;
+  text-align: center;
   display: block;
-  width: 128px;
+  margin: 0.5px;
   height: 128px;
+  line-height: 128px;
   font-family: sans-serif;
-  padding: 16px;
+  padding-left: 48px;
+  padding-right: 48px;
 }
 @media (max-width: 600px) {
   .project {
-    width: 64px;
-    height: 64px;
+  padding-left: 18px;
+  padding-right: 18px;
+  height: 64px;
+  line-height: 64px;
   }
 }
