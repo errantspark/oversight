@@ -2,15 +2,16 @@
   <!link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <script href="lib.js"></script>
   <script>
- console.log("lol") 
 function httpGet(theUrl)
+
 {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
     xmlHttp.send( null );
     return xmlHttp.responseText;
 }
-let k = httpGet('/update')
+let projects = JSON.parse(httpGet('/update'))
   </script>
 </body>

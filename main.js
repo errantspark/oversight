@@ -1,13 +1,10 @@
 let http = require('http')
 let fs = require('fs')
 let path = require('path')
-let asyn = require('async')
 let mime = require('mime')
 let git = require('simple-git')
 
-let callbacks
-
-let parsePath = (p,cb) => {
+let parsePath = p => {
   let ls = fs.readdirSync(p)
     .map(n => {
       let ent = {name:n}
@@ -22,32 +19,38 @@ let parsePath = (p,cb) => {
         ent.plan = fs.readFileSync(ent.planPath).toString()
       }
       ent.hasGit = ent.dir.find(x => x === '.git')?true:false
-      console.log(ent.name, ent.hasGit)
-      //let callback = (ent => (...res) => {
-      //  var ent.gitLog = res
-      //})(ent)
-      //git(ent.path).log({},callback)
-      return ent
+      if (ent.hasGit) {
+        let gitLog = new Promise((res,rej)=>{
+          let ret = (err,val) => {
+            if (!err) {
+              res(['gitLog',val.latest])
+            } else {
+              res(['gitLog',err])
+            }
+          }
+          git(ent.path).log({},ret)
+        })
+        let gitUrl = new Promise((res,rej)=>{
+          let ret = (err,val) => {
+            if (!err) {
+              res(['gitUrl',val])
+            } else {
+              res(['gitUrl',err])
+            }
+          }
+          git(ent.path).listRemote(['--get-url'],ret)
+        })
+        let rebuildEnt = Promise.all([gitUrl,gitLog]).then(a=>{
+          a.forEach(el => ent[el[0]]=el[1])
+          return ent
+        })
+        return rebuildEnt
+      } else {
+        return ent
+      }
     }
     )
-  console.log(ls)
-  let acb = (ent, callback) => {
-    let cbm = (ent => (err, v) => {
-      if (!err){
-        ent.gitLog = v.latest
-        callback(null, ent)
-      } else {
-        ent.gitLog = err
-        callback(null, ent)
-      }
-    })(ent)
-    if (ent.hasGit) {
-      git(ent.path).log({},cbm)
-    } else {
-      callback(null, ent)
-    }
-  }
-  asyn.map(ls, acb, cb)
+  return ls
 }
 
 let returnJson = (json, httpRes)=> {
@@ -63,7 +66,10 @@ let server = http.createServer((req, res) => {
     switch (req.url) {
       case '/update':
         //add api in here
-        parsePath('..', (err, ret) => returnJson(ret, res))
+        let ret = x => returnJson(x,res)
+        let dir = parsePath('..')
+        console.log(dir)
+        Promise.all(dir).then(ret).catch(console.log)
         break
       case '/':
         fs.readFile('index.html', (err, data) => {
@@ -99,4 +105,3 @@ let port = 8080
 let host = '127.0.0.1'
 server.listen(port, host)
 console.log('Listening at http://' + host + ':' + port)
-
