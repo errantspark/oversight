@@ -10,6 +10,24 @@ const promisedGitUrl = path => new Promise((res, rej) => {
   git(path).listRemote(['--get-url'], extractGitURL(res))
 });
 
+const promisedGitLog = path => new Promise((res,rej)=>{
+  let ret = (err, val) => {
+    if (!err) {
+      //turn date into linuxtime
+      val.latest.date = new Date(val.latest.date).getTime()
+      res([['gitLog',val.latest],['date',val.latest.date]])
+    } else {
+      res([['gitLog',err]])
+    }
+  }
+  git(path).log({},ret)
+});
+
+const shuffle = ent => a => {
+  a.forEach(ar => ar.forEach(el => ent[el[0]]=el[1]))
+  return ent
+}
+
 const hydrateEntity = ent => {
   ent.dir = fs.readdirSync(ent.path)
   ent.stat = fs.statSync(ent.path)
@@ -20,26 +38,8 @@ const hydrateEntity = ent => {
   }
   ent.hasGit = ent.dir.find(x => x === '.git')?true:false
   if (ent.hasGit) {
-    //deal with all git stuff using promises
-    let gitLog = new Promise((res,rej)=>{
-      let ret = (err, val) => {
-        if (!err) {
-          //turn date into linuxtime
-          val.latest.date = new Date(val.latest.date).getTime()
-          res([['gitLog',val.latest],['date',val.latest.date]])
-        } else {
-          res([['gitLog',err]])
-        }
-      }
-      git(ent.path).log({},ret)
-    })
-    
-    let rebuildEnt = Promise.all([promisedGitUrl(ent.path), gitLog]).then(a => {
-      a.forEach(ar => {
-        ar.forEach(el => ent[el[0]]=el[1])
-      })
-      return ent
-    })
+    let rebuildEnt = Promise.all([promisedGitUrl(ent.path), promisedGitLog(ent.path)])
+      .then(shuffle(ent))
     return rebuildEnt
   } else {
     return ent
