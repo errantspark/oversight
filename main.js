@@ -22,6 +22,7 @@ let parsePath = p => {
       }
       ent.hasGit = ent.dir.find(x => x === '.git')?true:false
       if (ent.hasGit) {
+        //deal with all git stuff using promises
         let gitLog = new Promise((res,rej)=>{
           let ret = (err,val) => {
             if (!err) {

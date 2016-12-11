@@ -3,10 +3,11 @@ body {
   margin: 0px;
   padding: 0px;
   background: #FFF8E7;
+  align-items: center;
+  display: flex;
 }
 #container {
   width: 90vw;
-  justify-content: center;
   margin: auto;
   padding: 0.5px;
   display: flex;
