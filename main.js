@@ -6,12 +6,8 @@ let git = require('simple-git')
 
 let parsePath = p => {
   let ls = fs.readdirSync(p)
-    .map(n => {
-      let ent = {name:n}
-      ent.path = path.join(p,ent.name)
-      return ent
-    })
-    .filter(ent => fs.statSync(ent.path).isDirectory())
+    .map(name => ({name, path: path.join(p, name)}))
+    .filter(({path}) => fs.statSync(path).isDirectory())
     .map(ent => {
       ent.dir = fs.readdirSync(ent.path)
       ent.stat = fs.statSync(ent.path)
@@ -59,51 +55,49 @@ let parsePath = p => {
   return ls
 }
 
-let returnJson = (json, httpRes)=> {
-  httpRes.writeHead(200, {
-    'Content-Type': 'text/json'
-  })
+const returnJson = (json, httpRes) => {
+  httpRes.writeHead(200, {'Content-Type': 'text/json'})
   httpRes.end(JSON.stringify(json))
 }
 
-let server = http.createServer((req, res) => {
-  if (req.method === 'GET') {
-    console.log('get: ',req.url)
-    switch (req.url) {
-      case '/update':
-        //add api in here
-        let ret = x => returnJson(x,res)
-        let dir = parsePath('..')
-        Promise.all(dir).then(ret).catch(console.log)
-        break
-      case '/':
-        fs.readFile('www/index.html', (err, data) => {
-          if (err) {
-            res.writeHead(404)
-            res.end()
-          } else {
-            res.writeHead(200, {
-              'Content-Type': 'text/html'
-            })
-            res.end(data)
-          }
-        })
-        break
-      default:
-        fs.readFile('www'+req.url, (err, data) => {
-          if (err) {
-            res.writeHead(404)
-            res.end()
-          } else {
-            res.writeHead(200, {
-              'Content-Type': mime.lookup(req.url)
-            })
-            res.end(data)
-          }
-        })
-        break
-    }
+const server = http.createServer((req, res) => {
+  if (req.method !== 'GET') return;
+  
+  console.log('get: ',req.url)
+  switch (req.url) {
+    case '/update':
+      let ret = x => returnJson(x,res)
+      let dir = parsePath('..')
+      Promise.all(dir).then(ret).catch(console.log)
+      break
+    case '/':
+      fs.readFile('www/index.html', (err, data) => {
+        if (err) {
+          res.writeHead(404)
+          res.end()
+        } else {
+          res.writeHead(200, {
+            'Content-Type': 'text/html'
+          })
+          res.end(data)
+        }
+      })
+      break
+    default:
+      fs.readFile('www'+req.url, (err, data) => {
+        if (err) {
+          res.writeHead(404)
+          res.end()
+        } else {
+          res.writeHead(200, {
+            'Content-Type': mime.lookup(req.url)
+          })
+          res.end(data)
+        }
+      })
+      break
   }
+
 })
 
 let port = 8080
