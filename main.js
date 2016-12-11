@@ -77,7 +77,7 @@ let server = http.createServer((req, res) => {
         Promise.all(dir).then(ret).catch(console.log)
         break
       case '/':
-        fs.readFile('index.html', (err, data) => {
+        fs.readFile('www/index.html', (err, data) => {
           if (err) {
             res.writeHead(404)
             res.end()
@@ -90,7 +90,7 @@ let server = http.createServer((req, res) => {
         })
         break
       default:
-        fs.readFile('.'+req.url, (err, data) => {
+        fs.readFile('www'+req.url, (err, data) => {
           if (err) {
             res.writeHead(404)
             res.end()
