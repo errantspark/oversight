@@ -2,6 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const git = require('simple-git');
 
+const extractGitURL = res => (err, val) => {
+  return err ? res([['gitUrl', err]]) : res([['gitUrl', val]]);
+}
+
 const hydrateEntity = ent => {
   ent.dir = fs.readdirSync(ent.path)
   ent.stat = fs.statSync(ent.path)
@@ -25,17 +29,10 @@ const hydrateEntity = ent => {
       }
       git(ent.path).log({},ret)
     })
-    let gitUrl = new Promise((res,rej)=>{
-      let ret = (err,val) => {
-        if (!err) {
-          res([['gitUrl',val]])
-        } else {
-          res([['gitUrl',err]])
-        }
-      }
-      git(ent.path).listRemote(['--get-url'],ret)
+    let gitUrl = new Promise((res, rej) => {
+      git(ent.path).listRemote(['--get-url'], extractGitURL(res))
     })
-    let rebuildEnt = Promise.all([gitUrl,gitLog]).then(a=>{
+    let rebuildEnt = Promise.all([gitUrl,gitLog]).then(a => {
       a.forEach(ar => {
         ar.forEach(el => ent[el[0]]=el[1])
       })
