@@ -39,11 +39,14 @@ body {
 .title {
   display: block;
   line-height: 1.5em;
-  border-bottom: 4px solid black;
+  border-bottom: 0.16em solid black;
   margin-bottom: 0.2em;
 }
-@media (max-width: 32em) {
+@media (max-width: 46em) {
   .project {
-  font-size: 1em;
+    height: 6em;
+    font-size: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
   }
 }
